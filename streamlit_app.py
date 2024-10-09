@@ -15,6 +15,9 @@ def get_tarif(tarif, options):
     beitrag = tarif.find_all(class_="price__PriceAmount-sc-19hw2m6-1")
     beitrag = [b.get_text() for b in beitrag] if beitrag else ['Keine Angabe']
 
+    # Nehme den ersten Beitrag und konvertiere ihn in einen Float
+    beitrag = float(re.sub(r'[^\d.]', '', beitrag[0])) if beitrag and isinstance(beitrag, list) else 0
+
     v = tarif.find_all(class_="badgeLabelsWithIcon__Title-sc-18wjrn2-3")
     v_texts = [v_elem.get_text() for v_elem in v]
 
@@ -37,7 +40,7 @@ def get_tarif(tarif, options):
         'Region': options['region'],
         'Person': options['person'],
         'Tarifname': tarifname,
-        'Beitrag': beitrag,
+        'Beitrag': beitrag,  # Beitrag wird jetzt als Float gespeichert
         'Zahlungsfrequenz': zahlungsfrequenz,
         'UmweltRabatt': options['umweltrabatt'],
         'Alter': int(options['alter']),
@@ -89,9 +92,6 @@ if st.button("Tarife abrufen"):
     st.write(f"Anzahl der gefundenen Tarife: {len(df_tarifs)}")
 
     if not df_tarifs.empty:
-        # Beitrag in Euro umwandeln
-        df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
-
         # Entfernen von doppelten Zeilen
         df_tarifs = df_tarifs.drop_duplicates()
 
