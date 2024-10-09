@@ -137,12 +137,3 @@ if st.button("Tarife abrufen"):
         bar_fig.update_traces(texttemplate='%{y:.2f} €', textposition='outside')  # Betrag an der Spitze der Balken anzeigen
 
         st.plotly_chart(bar_fig)
-
-        # Liniendiagramm erstellen
-        line_fig = go.Figure()
-        for i, row in df_tarifs_filtered.iterrows():
-            line_fig.add_trace(go.Scatter(
-                x=[row['Tarifname']],
-                y=[row['Beitrag']],
-                mode='lines+markers',
-                name=row['
