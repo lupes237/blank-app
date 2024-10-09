@@ -151,5 +151,5 @@ bar_fig.update_layout(
 # Diagramm anzeigen
 st.plotly_chart(bar_fig)
 
-    else:
+else:
         st.write("Keine Tarife gefunden.")
