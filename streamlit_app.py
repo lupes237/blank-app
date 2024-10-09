@@ -4,11 +4,11 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 from datetime import datetime, timedelta
-import plotly.graph_objs as go
 
 # Funktion zum Extrahieren von Tarifinformationen
 def get_tarif(tarif, options):
     tarifname = tarif.find(class_="logo__TariffName-sc-1jenrlw-3").get_text()
+
     anbietername = tarif.find(class_="badgeLabelsWithIcon__BadgeLabel-sc-18wjrn2-2").get('data-tooltip-id')
     anbietername = re.search(r'BadgeLabelWithIcon-([\w\s/]+)-', anbietername).group(1) if anbietername else 'Unbekannt'
 
@@ -29,9 +29,6 @@ def get_tarif(tarif, options):
     zahlungsfrequenz = tarif.find_all(class_="price__Period-sc-19hw2m6-2")
     zahlungsfrequenz = [z.get_text() for z in zahlungsfrequenz] if zahlungsfrequenz else ['Keine Angabe']
 
-    rest = tarif.find_all(class_="badgeLabels__BadgeLabelWrapper-sc-uavc85-1")
-    rest_texts = ";".join([r.get_text() for r in rest]) if rest else 'keine'
-
     current_date = datetime.now().strftime("%d-%m-%Y")
 
     return {
@@ -49,7 +46,6 @@ def get_tarif(tarif, options):
         'Ersatzwagen': ersatzwagen,
         'Abschleppen': abschleppen,
         'Krankenruecktransport': krankenruecktransport,
-        'AndereInformationen': rest_texts,
         'PLZ': options['plz'],
         'AbrufUrl': options['url']
     }
@@ -96,56 +92,8 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
-        # Filtern der doppelten Anbieterwerte nur für ACV Komfort und ACE Comfort+
-        df_acv_komfort = df_tarifs[df_tarifs['Anbietername'] == 'ACV Komfort']
-        df_ace_comfort_plus = df_tarifs[df_tarifs['Anbietername'] == 'ACE Comfort+']
-
-        # Alle anderen Anbieter beibehalten
-        df_rest = df_tarifs[~df_tarifs['Anbietername'].isin(['ACV Komfort', 'ACE Comfort+'])]
-
-        # Doppelte herausfiltern, wobei der Tarif mit dem niedrigsten Beitrag genommen wird
-        df_acv_komfort = df_acv_komfort.sort_values(by='Beitrag').drop_duplicates(subset='Tarifname', keep='first')
-        df_ace_comfort_plus = df_ace_comfort_plus.sort_values(by='Beitrag').drop_duplicates(subset='Tarifname', keep='first')
-
-        # Kombinieren der DataFrames
-        df_tarifs_filtered = pd.concat([df_rest, df_acv_komfort, df_ace_comfort_plus])
-
-        # Sortiere nach Beitrag (Höhe)
-        df_tarifs_filtered = df_tarifs_filtered.sort_values(by='Beitrag', ascending=True)
-
-        # Farben für die Anbieter definieren
-        unique_anbieter = df_tarifs_filtered['Anbietername'].unique()
-        colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
-        color_mapping = {anbieter: colors[i % len(colors)] for i, anbieter in enumerate(unique_anbieter)}
-
-       # Balkendiagramm erstellen
-bar_fig = go.Figure()
-
-# Sortierung nach Beitrag (Höhe)
-df_tarifs_filtered = df_tarifs_filtered.sort_values(by='Beitrag', ascending=True)
-
-# Hinzufügen der Balken zum Diagramm
-bar_fig.add_trace(go.Bar(
-    x=df_tarifs_filtered['Tarifname'],
-    y=df_tarifs_filtered['Beitrag'],
-    name='Beitrag',
-    marker_color=[color_mapping[anbieter] for anbieter in df_tarifs_filtered['Anbietername']],  # Farben zuordnen
-    width=0.6  # Dicke der Balken
-))
-
-# Layout anpassen
-bar_fig.update_layout(
-    title='Balkendiagramm: Tarife vergleichen',
-    xaxis_title='Tarifname',
-    yaxis_title='Beitrag in Euro',
-    xaxis_tickangle=-45,
-    width=1200,  # Breite des Diagramms erhöhen
-    height=600  # Höhe des Diagramms erhöhen
-)
-
-# Betrag an der Spitze der Balken anzeigen
-bar_fig.update_traces(texttemplate='%{y:.2f} €', textposition='outside')
-
-# Diagramm anzeigen
-st.plotly_chart(bar_fig)
-
+        # Tabelle anzeigen
+        st.write("Tariftabelle:")
+        st.dataframe(df_tarifs)
+    else:
+        st.write("Keine Tarife gefunden.")
