@@ -92,6 +92,9 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
+        # Entfernen von doppelten Zeilen
+        df_tarifs = df_tarifs.drop_duplicates()
+
         # Tabelle anzeigen
         st.write("Tariftabelle:")
         st.dataframe(df_tarifs)
