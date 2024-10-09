@@ -97,6 +97,9 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
+        # Sortiere nach Beitrag (Höhe)
+        df_tarifs = df_tarifs.sort_values(by='Beitrag', ascending=True)
+
         # Farben für die Balken generieren
         colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
         
@@ -112,7 +115,9 @@ if st.button("Tarife abrufen"):
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
                               xaxis_title='Tarifname',
                               yaxis_title='Beitrag in Euro',
-                              xaxis_tickangle=-45)
+                              xaxis_tickangle=-45,
+                              width=1000,  # Breite des Diagramms
+                              height=500)  # Höhe des Diagramms
 
         st.plotly_chart(bar_fig)
 
@@ -130,7 +135,9 @@ if st.button("Tarife abrufen"):
         line_fig.update_layout(title='Liniendiagramm: Tarife vergleichen',
                                xaxis_title='Tarifname',
                                yaxis_title='Beitrag in Euro',
-                               xaxis_tickangle=-45)
+                               xaxis_tickangle=-45,
+                               width=1000,  # Breite des Diagramms
+                               height=500)  # Höhe des Diagramms
 
         st.plotly_chart(line_fig)
 
