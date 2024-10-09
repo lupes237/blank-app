@@ -73,7 +73,7 @@ st.title("KFZ Schutzbrief Tarife vergleichen")
 region = st.selectbox("Wähle eine Region:", ["Germany", "Europe", "World"])
 person = st.selectbox("Wähle eine Personengruppe:", ["Single", "Pair", "Family"])
 plz = st.text_input("Postleitzahl:", "40210")
-umweltrabatt = st.selectbox("Umwelrabatt:", ["ja", "nein"])
+umweltrabatt = st.selectbox("Umweltrabatt:", ["ja", "nein"])
 alter = st.slider("Alter:", 18, 31)
 
 # Button zum Abrufen der Daten
@@ -84,7 +84,7 @@ if st.button("Tarife abrufen"):
         'person': person,
         'plz': plz,
         'url': url,
-        'umweltrabatt': umwelrabatt,
+        'umweltrabatt': umweltrabatt,
         'alter': alter
     }
     tarifs = get_all_tarifs_by_url(options)
