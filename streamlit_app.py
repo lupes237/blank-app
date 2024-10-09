@@ -118,22 +118,34 @@ if st.button("Tarife abrufen"):
         colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
         color_mapping = {anbieter: colors[i % len(colors)] for i, anbieter in enumerate(unique_anbieter)}
 
-        # Balkendiagramm erstellen
-        bar_fig = go.Figure()
-        for i, row in df_tarifs_filtered.iterrows():
-            bar_fig.add_trace(go.Bar(
-                x=[row['Tarifname']],
-                y=[row['Beitrag']],
-                name=row['Anbietername'],
-                marker_color=color_mapping[row['Anbietername']],
-                width=0.6  # Dicke der Balken
-            ))
-        bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
-                              xaxis_title='Tarifname',
-                              yaxis_title='Beitrag in Euro',
-                              xaxis_tickangle=-45,
-                              width=1200,  # Breite des Diagramms erhöhen
-                              height=600)  # Höhe des Diagramms erhöhen
-        bar_fig.update_traces(texttemplate='%{y:.2f} €', textposition='outside')  # Betrag an der Spitze der Balken anzeigen
+       # Balkendiagramm erstellen
+bar_fig = go.Figure()
 
-        st.plotly_chart(bar_fig)
+# Sortierung nach Beitrag (Höhe)
+df_tarifs_filtered = df_tarifs_filtered.sort_values(by='Beitrag', ascending=True)
+
+# Hinzufügen der Balken zum Diagramm
+bar_fig.add_trace(go.Bar(
+    x=df_tarifs_filtered['Tarifname'],
+    y=df_tarifs_filtered['Beitrag'],
+    name='Beitrag',
+    marker_color=[color_mapping[anbieter] for anbieter in df_tarifs_filtered['Anbietername']],  # Farben zuordnen
+    width=0.6  # Dicke der Balken
+))
+
+# Layout anpassen
+bar_fig.update_layout(
+    title='Balkendiagramm: Tarife vergleichen',
+    xaxis_title='Tarifname',
+    yaxis_title='Beitrag in Euro',
+    xaxis_tickangle=-45,
+    width=1200,  # Breite des Diagramms erhöhen
+    height=600  # Höhe des Diagramms erhöhen
+)
+
+# Betrag an der Spitze der Balken anzeigen
+bar_fig.update_traces(texttemplate='%{y:.2f} €', textposition='outside')
+
+# Diagramm anzeigen
+st.plotly_chart(bar_fig)
+
