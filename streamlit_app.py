@@ -4,8 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import plotly.express as px
+import plotly.graph_objs as go
 
 # Funktion zum Extrahieren von Tarifinformationen
 def get_tarif(tarif, options):
@@ -93,27 +92,42 @@ if st.button("Tarife abrufen"):
 
     # Ergebnisse anzeigen
     st.write(f"Anzahl der gefundenen Tarife: {len(df_tarifs)}")
-    st.dataframe(df_tarifs)
 
-    # Diagramm erstellen
     if not df_tarifs.empty:
-        # Beitragsdaten bereinigen
+        # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
         # Balkendiagramm erstellen
-        st.subheader("Balkendiagramm der Tarife")
-        fig = px.bar(df_tarifs, x='Tarifname', y='Beitrag', color='Anbietername', title='Beitrag nach Tarifname', labels={'Beitrag': 'Beitrag in Euro', 'Tarifname': 'Tarifname'})
-        st.plotly_chart(fig)
+        bar_fig = go.Figure()
+        bar_fig.add_trace(go.Bar(
+            x=df_tarifs['Tarifname'],
+            y=df_tarifs['Beitrag'],
+            name='Beitrag in Euro',
+            marker_color='blue'
+        ))
+        bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
+                              xaxis_title='Tarifname',
+                              yaxis_title='Beitrag in Euro',
+                              xaxis_tickangle=-45)
 
-        # Boxplot erstellen
-        st.subheader("Boxplot der Beiträge")
-        fig2 = px.box(df_tarifs, y='Beitrag', title='Boxplot der Beiträge', labels={'Beitrag': 'Beitrag in Euro'})
-        st.plotly_chart(fig2)
+        st.plotly_chart(bar_fig)
 
-        # Scatterplot erstellen
-        st.subheader("Scatterplot der Beiträge")
-        fig3 = px.scatter(df_tarifs, x='Alter', y='Beitrag', color='Anbietername', title='Beitrag nach Alter', labels={'Beitrag': 'Beitrag in Euro', 'Alter': 'Alter'})
-        st.plotly_chart(fig3)
+        # Liniendiagramm erstellen
+        line_fig = go.Figure()
+        line_fig.add_trace(go.Scatter(
+            x=df_tarifs['Tarifname'],
+            y=df_tarifs['Beitrag'],
+            mode='lines+markers',
+            name='Beitrag in Euro',
+            line=dict(shape='linear'),
+            marker=dict(color='red')
+        ))
+        line_fig.update_layout(title='Liniendiagramm: Tarife vergleichen',
+                               xaxis_title='Tarifname',
+                               yaxis_title='Beitrag in Euro',
+                               xaxis_tickangle=-45)
+
+        st.plotly_chart(line_fig)
 
     # Option zum CSV-Download
     csv = df_tarifs.to_csv(index=False, sep=";")
