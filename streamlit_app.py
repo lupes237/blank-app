@@ -97,14 +97,18 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
+        # Farben für die Balken generieren
+        colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
+        
         # Balkendiagramm erstellen
         bar_fig = go.Figure()
-        bar_fig.add_trace(go.Bar(
-            x=df_tarifs['Tarifname'],
-            y=df_tarifs['Beitrag'],
-            name='Beitrag in Euro',
-            marker_color='blue'
-        ))
+        for i, row in df_tarifs.iterrows():
+            bar_fig.add_trace(go.Bar(
+                x=[row['Tarifname']],
+                y=[row['Beitrag']],
+                name=row['Anbietername'],
+                marker_color=colors[i % len(colors)]
+            ))
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
                               xaxis_title='Tarifname',
                               yaxis_title='Beitrag in Euro',
@@ -114,14 +118,15 @@ if st.button("Tarife abrufen"):
 
         # Liniendiagramm erstellen
         line_fig = go.Figure()
-        line_fig.add_trace(go.Scatter(
-            x=df_tarifs['Tarifname'],
-            y=df_tarifs['Beitrag'],
-            mode='lines+markers',
-            name='Beitrag in Euro',
-            line=dict(shape='linear'),
-            marker=dict(color='red')
-        ))
+        for i, row in df_tarifs.iterrows():
+            line_fig.add_trace(go.Scatter(
+                x=[row['Tarifname']],
+                y=[row['Beitrag']],
+                mode='lines+markers',
+                name=row['Anbietername'],
+                line=dict(shape='linear', color=colors[i % len(colors)]),
+                marker=dict(color=colors[i % len(colors)])
+            ))
         line_fig.update_layout(title='Liniendiagramm: Tarife vergleichen',
                                xaxis_title='Tarifname',
                                yaxis_title='Beitrag in Euro',
