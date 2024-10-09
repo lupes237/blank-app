@@ -147,4 +147,7 @@ if st.button("Tarife abrufen"):
                 y=[row['Beitrag']],
                 mode='lines+markers',
                 name=row['Anbietername'],
-                line=dict(shape='linear', color=color_mapping[row['Anbietername']]),  #
+                line=dict(shape='linear', color=color_mapping[row['Anbietername']]),  # Eindeutige Farbe pro Anbieter
+                marker=dict(color=color_mapping[row['Anbietername']])
+            ))
+        line
