@@ -101,6 +101,8 @@ if st.button("Tarife abrufen"):
 
         # Balkendiagramm erstellen
         bar_fig = go.Figure()
+
+        # Daten für das Balkendiagramm in der Reihenfolge der sortierten Tabelle hinzufügen
         for i, row in df_tarifs_sorted.iterrows():
             bar_fig.add_trace(go.Bar(
                 x=[row['Tarifname']],
@@ -120,7 +122,8 @@ if st.button("Tarife abrufen"):
             height=600  # Höhe des Diagramms
         )
 
-        st.plotly_chart(bar_fig)  # Diagramm anzeigen
+        # Anzeigen des Balkendiagramms
+        st.plotly_chart(bar_fig)
 
     else:
         st.write("Keine Tarife gefunden.")
