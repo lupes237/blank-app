@@ -125,5 +125,32 @@ if st.button("Tarife abrufen"):
         # Anzeigen des Balkendiagramms
         st.plotly_chart(bar_fig)
 
+# Horizontales Balkendiagramm
+bar_fig = go.Figure()
+
+# Daten für das Balkendiagramm in der Reihenfolge der sortierten Tabelle hinzufügen
+for i, row in df_tarifs_sorted.iterrows():
+    bar_fig.add_trace(go.Bar(
+        x=[float(row['Beitrag'].replace(' €', '').replace(',', '.'))],  # Beitrag in der richtigen Reihenfolge
+        y=[row['Tarifname']],
+        name=row['Anbietername'],
+        text=row['Beitrag'],  # Beitrag als Text anzeigen
+        textposition='outside',  # Text außerhalb des Balkens
+        orientation='h',  # Horizontale Ausrichtung
+        marker=dict(color='blue')  # Alle Balken in Blau
+    ))
+
+bar_fig.update_layout(
+    title='Horizontales Balkendiagramm: Tarife vergleichen',
+    xaxis_title='Beitrag in Euro',
+    yaxis_title='Tarifname',
+    width=800,  # Breite des Diagramms
+    height=600  # Höhe des Diagramms
+)
+
+# Diagramm anzeigen
+st.plotly_chart(bar_fig)
+
+
     else:
         st.write("Keine Tarife gefunden.")
