@@ -19,6 +19,17 @@ def get_tarif(tarif, options):
     beitrag = float(re.sub(r'[^\d.]', '', beitrag[0])) if beitrag and isinstance(beitrag, list) else 0
 
     # Weitere Tarifdetails
+    v = tarif.find_all(class_="badgeLabelsWithIcon__Title-sc-18wjrn2-3")
+    v_texts = [v_elem.get_text() for v_elem in v]
+    
+    rabatt_elem = tarif.find(class_="price__CrossedOutPercentage-sc-19hw2m6-5")
+    rabatt = rabatt_elem.get_text().replace("-", "") if rabatt_elem else 'keine'
+
+    pannenhilfe = next((s.replace("Pannenhilfe ", "") for s in v_texts if "Pannenhilfe" in s), 'Nein')
+    ersatzwagen = next((s.replace("Ersatzwagen ", "") for s in v_texts if "Ersatzwagen" in s), 'Nein')
+    abschleppen = 'Ja' if any("Abschleppen des Fahrzeugs" in s for s in v_texts) else 'Nein'
+    krankenruecktransport = next((s for s in v_texts if "Krankenrücktransport" in s), 'Nein')
+
     current_date = datetime.now().strftime("%d-%m-%Y")
 
     return {
@@ -28,6 +39,11 @@ def get_tarif(tarif, options):
         'Person': options['person'],
         'Tarifname': tarifname,
         'Beitrag': beitrag,  # Beitrag wird jetzt als Float gespeichert
+        'Rabatt': rabatt,
+        'Pannenhilfe': pannenhilfe,
+        'Ersatzwagen': ersatzwagen,
+        'Abschleppen': abschleppen,
+        'Krankenruecktransport': krankenruecktransport,
     }
 
 def get_all_tarifs_by_url(options):
