@@ -92,6 +92,9 @@ if st.button("Tarife abrufen"):
         # Tabelle nach Beitrag aufsteigend sortieren
         df_tarifs_sorted = df_tarifs.sort_values(by='Beitrag', ascending=True)
 
+        # Beitrag formatieren (z.B. 8190 -> 81,90 €)
+        df_tarifs_sorted['Beitrag'] = df_tarifs_sorted['Beitrag'].apply(lambda x: f"{x/100:.2f} €")
+
         # Tabelle anzeigen
         st.write("Tariftabelle (aufsteigend nach Beitrag sortiert):")
         st.dataframe(df_tarifs_sorted)
@@ -103,7 +106,7 @@ if st.button("Tarife abrufen"):
                 x=[row['Tarifname']],
                 y=[row['Beitrag']],
                 name=row['Anbietername'],
-                text=f"{row['Beitrag']} €",  # Betrag als Text anzeigen
+                text=row['Beitrag'],  # Betrag als Text anzeigen
                 textposition='outside',  # Text außerhalb des Balkens
                 marker=dict(color='blue')  # Alle Balken in Blau
             ))
