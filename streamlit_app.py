@@ -96,14 +96,15 @@ if st.button("Tarife abrufen"):
         st.write("Tariftabelle (aufsteigend nach Beitrag sortiert):")
         st.dataframe(df_tarifs_sorted)
 
-        # Punktdiagramm erstellen
-        fig = px.scatter(
+        # Liniendiagramm mit Punkten erstellen
+        fig = px.line(
             df_tarifs_sorted,
             x="Beitrag",
             y="Tarifname",
-            color="Anbietername",  # Farben je nach Anbietername
+            color="Anbietername",  # Linien je nach Anbietername
+            markers=True,  # Punkte an den Tarifstellen anzeigen
             hover_data=["Beitrag", "Tarifname", "Rabatt", "Pannenhilfe", "Ersatzwagen", "Abschleppen", "Krankenruecktransport"],
-            title="Punktdiagramm der Tarife",
+            title="Liniendiagramm der Tarife nach Anbietern",
             labels={"Beitrag": "Beitrag in Euro", "Tarifname": "Tarifname"}
         )
         
