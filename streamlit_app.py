@@ -5,6 +5,7 @@ import pandas as pd
 import re
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Funktion zum Extrahieren von Tarifinformationen
 def get_tarif(tarif, options):
@@ -78,13 +79,13 @@ alter = st.slider("Alter:", 18, 31)
 
 # Button zum Abrufen der Daten
 if st.button("Tarife abrufen"):
-    url = generate_url(region, g_person=person, umwelt_rabatt=umweltrabatt, plz=plz, alter=alter)
+    url = generate_url(region, g_person=person, umwelt_rabatt=umwelrabatt, plz=plz, alter=alter)
     options = {
         'region': region,
         'person': person,
         'plz': plz,
         'url': url,
-        'umweltrabatt': umweltrabatt,
+        'umweltrabatt': umwelrabatt,
         'alter': alter
     }
     tarifs = get_all_tarifs_by_url(options)
@@ -96,17 +97,24 @@ if st.button("Tarife abrufen"):
 
     # Diagramm erstellen
     if not df_tarifs.empty:
-        # Beispiel: Preisdiagramm
+        # Beitragsdaten bereinigen
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
-        plt.figure(figsize=(10, 5))
-        plt.bar(df_tarifs['Tarifname'], df_tarifs['Beitrag'], color='blue')
-        plt.xlabel('Tarifname')
-        plt.ylabel('Beitrag in Euro')
-        plt.title('Tarife vergleichen')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        st.pyplot(plt)
-        
+
+        # Balkendiagramm erstellen
+        st.subheader("Balkendiagramm der Tarife")
+        fig = px.bar(df_tarifs, x='Tarifname', y='Beitrag', color='Anbietername', title='Beitrag nach Tarifname', labels={'Beitrag': 'Beitrag in Euro', 'Tarifname': 'Tarifname'})
+        st.plotly_chart(fig)
+
+        # Boxplot erstellen
+        st.subheader("Boxplot der Beiträge")
+        fig2 = px.box(df_tarifs, y='Beitrag', title='Boxplot der Beiträge', labels={'Beitrag': 'Beitrag in Euro'})
+        st.plotly_chart(fig2)
+
+        # Scatterplot erstellen
+        st.subheader("Scatterplot der Beiträge")
+        fig3 = px.scatter(df_tarifs, x='Alter', y='Beitrag', color='Anbietername', title='Beitrag nach Alter', labels={'Beitrag': 'Beitrag in Euro', 'Alter': 'Alter'})
+        st.plotly_chart(fig3)
+
     # Option zum CSV-Download
     csv = df_tarifs.to_csv(index=False, sep=";")
     st.download_button(label="CSV herunterladen", data=csv, file_name="KFZ-Schutzbrief-Tarife.csv", mime="text/csv")
