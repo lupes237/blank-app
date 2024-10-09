@@ -97,11 +97,16 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
+        # Doppelte Anbieter herausfiltern, wobei der Tarif mit dem niedrigsten Beitrag genommen wird
+        df_tarifs = df_tarifs.sort_values(by='Beitrag').drop_duplicates(subset='Anbietername', keep='first')
+
         # Sortiere nach Beitrag (Höhe)
         df_tarifs = df_tarifs.sort_values(by='Beitrag', ascending=True)
 
-        # Farben für die Balken generieren
+        # Farben für die Anbieter definieren
+        unique_anbieter = df_tarifs['Anbietername'].unique()
         colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
+        color_mapping = {anbieter: colors[i % len(colors)] for i, anbieter in enumerate(unique_anbieter)}
         
         # Balkendiagramm erstellen
         bar_fig = go.Figure()
@@ -110,7 +115,7 @@ if st.button("Tarife abrufen"):
                 x=[row['Tarifname']],
                 y=[row['Beitrag']],
                 name=row['Anbietername'],
-                marker_color=colors[i % len(colors)],
+                marker_color=color_mapping[row['Anbietername']],  # Eindeutige Farbe pro Anbieter
                 width=0.6  # Dicke der Balken
             ))
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
@@ -131,8 +136,8 @@ if st.button("Tarife abrufen"):
                 y=[row['Beitrag']],
                 mode='lines+markers',
                 name=row['Anbietername'],
-                line=dict(shape='linear', color=colors[i % len(colors)]),
-                marker=dict(color=colors[i % len(colors)])
+                line=dict(shape='linear', color=color_mapping[row['Anbietername']]),  # Eindeutige Farbe pro Anbieter
+                marker=dict(color=color_mapping[row['Anbietername']])
             ))
         line_fig.update_layout(title='Liniendiagramm: Tarife vergleichen',
                                xaxis_title='Tarifname',
@@ -146,8 +151,4 @@ if st.button("Tarife abrufen"):
 
         # Tabelle mit den Tarifdaten anzeigen
         st.subheader("Tarifdaten")
-        st.dataframe(df_tarifs)
-
-    # Option zum CSV-Download
-    csv = df_tarifs.to_csv(index=False, sep=";")
-    st.download_button(label="CSV herunterladen", data=csv, file_name="KFZ-Schutzbrief-Tarife.csv", mime="text/csv")
+       
