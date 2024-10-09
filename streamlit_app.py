@@ -111,14 +111,15 @@ if st.button("Tarife abrufen"):
                 y=[row['Beitrag']],
                 name=row['Anbietername'],
                 marker_color=colors[i % len(colors)],
-                width=0.4  # Dicke der Balken
+                width=0.6  # Dicke der Balken
             ))
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
                               xaxis_title='Tarifname',
                               yaxis_title='Beitrag in Euro',
                               xaxis_tickangle=-45,
-                              width=1000,  # Breite des Diagramms
-                              height=500)  # Höhe des Diagramms
+                              width=1200,  # Breite des Diagramms erhöhen
+                              height=600)  # Höhe des Diagramms erhöhen
+        bar_fig.update_traces(texttemplate='%{y:.2f} €', textposition='outside')  # Betrag an der Spitze der Balken anzeigen
 
         st.plotly_chart(bar_fig)
 
@@ -137,8 +138,9 @@ if st.button("Tarife abrufen"):
                                xaxis_title='Tarifname',
                                yaxis_title='Beitrag in Euro',
                                xaxis_tickangle=-45,
-                               width=1000,  # Breite des Diagramms
-                               height=500)  # Höhe des Diagramms
+                               width=1200,  # Breite des Diagramms erhöhen
+                               height=600)  # Höhe des Diagramms erhöhen
+        line_fig.update_traces(texttemplate='%{y:.2f} €', textposition='top')  # Betrag an den Linien anzeigen
 
         st.plotly_chart(line_fig)
 
