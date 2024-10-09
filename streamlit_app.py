@@ -73,7 +73,7 @@ region = st.selectbox("Wähle eine Region:", ["Germany", "Europe", "World"])
 person = st.selectbox("Wähle eine Personengruppe:", ["Single", "Pair", "Family"])
 plz = st.text_input("Postleitzahl:", "40210")
 umweltrabatt = st.selectbox("Umweltrabatt:", ["ja", "nein"])
-alter = st.slider("Alter:", 18, 30, 70)
+alter = st.slider("Alter:", 18, 31)
 
 # Button zum Abrufen der Daten
 if st.button("Tarife abrufen"):
