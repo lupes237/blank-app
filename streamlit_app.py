@@ -97,36 +97,20 @@ if st.button("Tarife abrufen"):
         # Beitrag in Euro umwandeln
         df_tarifs['Beitrag'] = df_tarifs['Beitrag'].apply(lambda x: float(re.sub(r'[^\d.]', '', x[0])) if isinstance(x, list) and x else 0)
 
-        # Filtern der doppelten Anbieterwerte nur für ACV Komfort und ACE Comfort+
-        df_acv_komfort = df_tarifs[df_tarifs['Anbietername'] == 'ACV Komfort']
-        df_ace_comfort_plus = df_tarifs[df_tarifs['Anbietername'] == 'ACE Comfort+']
-        
-        # Alle anderen Anbieter beibehalten
-        df_rest = df_tarifs[~df_tarifs['Anbietername'].isin(['ACV Komfort', 'ACE Comfort+'])]
-
-        # Doppelte herausfiltern, wobei der Tarif mit dem niedrigsten Beitrag genommen wird
-        df_acv_komfort = df_acv_komfort.sort_values(by='Beitrag').drop_duplicates(subset='Tarifname', keep='first')
-        df_ace_comfort_plus = df_ace_comfort_plus.sort_values(by='Beitrag').drop_duplicates(subset='Tarifname', keep='first')
-
-        # Kombinieren der DataFrames
-        df_tarifs_filtered = pd.concat([df_rest, df_acv_komfort, df_ace_comfort_plus])
-
         # Sortiere nach Beitrag (Höhe)
-        df_tarifs_filtered = df_tarifs_filtered.sort_values(by='Beitrag', ascending=True)
+        df_tarifs = df_tarifs.sort_values(by='Beitrag', ascending=True)
 
-        # Farben für die Anbieter definieren
-        unique_anbieter = df_tarifs_filtered['Anbietername'].unique()
+        # Farben für die Balken generieren
         colors = ['blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta', 'yellow', 'brown', 'pink']
-        color_mapping = {anbieter: colors[i % len(colors)] for i, anbieter in enumerate(unique_anbieter)}
         
         # Balkendiagramm erstellen
         bar_fig = go.Figure()
-        for i, row in df_tarifs_filtered.iterrows():
+        for i, row in df_tarifs.iterrows():
             bar_fig.add_trace(go.Bar(
                 x=[row['Tarifname']],
                 y=[row['Beitrag']],
                 name=row['Anbietername'],
-                marker_color=color_mapping[row['Anbietername']],  # Eindeutige Farbe pro Anbieter
+                marker_color=colors[i % len(colors)],
                 width=0.6  # Dicke der Balken
             ))
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
@@ -141,13 +125,29 @@ if st.button("Tarife abrufen"):
 
         # Liniendiagramm erstellen
         line_fig = go.Figure()
-        for i, row in df_tarifs_filtered.iterrows():
+        for i, row in df_tarifs.iterrows():
             line_fig.add_trace(go.Scatter(
                 x=[row['Tarifname']],
                 y=[row['Beitrag']],
                 mode='lines+markers',
                 name=row['Anbietername'],
-                line=dict(shape='linear', color=color_mapping[row['Anbietername']]),  # Eindeutige Farbe pro Anbieter
-                marker=dict(color=color_mapping[row['Anbietername']])
+                line=dict(shape='linear', color=colors[i % len(colors)]),
+                marker=dict(color=colors[i % len(colors)])
             ))
-        line_fig.update_layout(title='
+        line_fig.update_layout(title='Liniendiagramm: Tarife vergleichen',
+                               xaxis_title='Tarifname',
+                               yaxis_title='Beitrag in Euro',
+                               xaxis_tickangle=-45,
+                               width=1200,  # Breite des Diagramms erhöhen
+                               height=600)  # Höhe des Diagramms erhöhen
+        line_fig.update_traces(texttemplate='%{y:.2f} €', textposition='top center')  # Betrag an den Linien anzeigen
+
+        st.plotly_chart(line_fig)
+
+        # Tabelle mit den Tarifdaten anzeigen
+        st.subheader("Tarifdaten")
+        st.dataframe(df_tarifs)
+
+    # Option zum CSV-Download
+    csv = df_tarifs.to_csv(index=False, sep=";")
+    st.download_button(label="CSV herunterladen", data=csv, file_name="KFZ-Schutzbrief-Tarife.csv", mime="text/csv")
