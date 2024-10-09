@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
+import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
 # Funktion zum Extrahieren von Tarifinformationen
@@ -71,27 +72,46 @@ st.title("KFZ Schutzbrief Tarife vergleichen")
 # Input-Felder für die Benutzereingabe
 region = st.selectbox("Wähle eine Region:", ["Germany", "Europe", "World"])
 person = st.selectbox("Wähle eine Personengruppe:", ["Single", "Pair", "Family"])
-plz = st.text_input("Postleitzahl:", "40210")
+
+# Auswahl von mehreren Postleitzahlen
+plz_options = ["40210", "10115", "20095", "80331"]  # Füge hier die gewünschten Postleitzahlen hinzu
+plz = st.multiselect("Wähle Postleitzahlen:", plz_options, default=["40210"])
+
 umweltrabatt = st.selectbox("Umweltrabatt:", ["ja", "nein"])
 alter = st.slider("Alter:", 18, 70, 30)
 
 # Button zum Abrufen der Daten
 if st.button("Tarife abrufen"):
-    url = generate_url(region, g_person=person, umwelt_rabatt=umweltrabatt, plz=plz, alter=alter)
+    # Hier werden alle Postleitzahlen in einer Liste zusammengefügt
+    plz_str = ",".join(plz)  # Komma getrennte Liste von Postleitzahlen
+    url = generate_url(region, g_person=person, umwelt_rabatt=umwelrabatt, plz=plz_str, alter=alter)
+    
     options = {
         'region': region,
         'person': person,
-        'plz': plz,
+        'plz': plz_str,
         'url': url,
-        'umweltrabatt': umweltrabatt,
+        'umweltrabatt': umwelrabatt,
         'alter': alter
     }
+    
     tarifs = get_all_tarifs_by_url(options)
     df_tarifs = pd.DataFrame(tarifs)
+
+    # Diagramm erstellen
+    # Wir nehmen an, dass die Beiträge als Strings kommen, wir müssen sie in Zahlen umwandeln.
+    df_tarifs['Beitrag'] = df_tarifs['Beitrag'].str.replace('€', '').str.replace('.', '').str.replace(',', '.').astype(float)
     
-    # Ergebnisse anzeigen
-    st.write(f"Anzahl der gefundenen Tarife: {len(df_tarifs)}")
-    st.dataframe(df_tarifs)
+    plt.figure(figsize=(10, 6))
+    plt.bar(df_tarifs['Anbietername'], df_tarifs['Beitrag'], color='skyblue')
+    plt.title('Tarife nach Anbieter')
+    plt.xlabel('Anbietername')
+    plt.ylabel('Beitrag in €')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    # Diagramm anzeigen
+    st.pyplot(plt)
 
     # Option zum CSV-Download
     csv = df_tarifs.to_csv(index=False, sep=";")
