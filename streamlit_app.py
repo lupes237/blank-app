@@ -110,7 +110,8 @@ if st.button("Tarife abrufen"):
                 x=[row['Tarifname']],
                 y=[row['Beitrag']],
                 name=row['Anbietername'],
-                marker_color=colors[i % len(colors)]
+                marker_color=colors[i % len(colors)],
+                width=0.4  # Dicke der Balken
             ))
         bar_fig.update_layout(title='Balkendiagramm: Tarife vergleichen',
                               xaxis_title='Tarifname',
@@ -140,6 +141,10 @@ if st.button("Tarife abrufen"):
                                height=500)  # Höhe des Diagramms
 
         st.plotly_chart(line_fig)
+
+        # Tabelle mit den Tarifdaten anzeigen
+        st.subheader("Tarifdaten")
+        st.dataframe(df_tarifs)
 
     # Option zum CSV-Download
     csv = df_tarifs.to_csv(index=False, sep=";")
