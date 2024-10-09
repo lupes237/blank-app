@@ -2,4 +2,5 @@ streamlit
 beautifulsoup4==4.11.1  # Füge die Version hinzu
 pandas
 matplotlib
+plotly
 requests
