@@ -140,7 +140,7 @@ if st.button("Tarife abrufen"):
                                xaxis_tickangle=-45,
                                width=1200,  # Breite des Diagramms erhöhen
                                height=600)  # Höhe des Diagramms erhöhen
-        line_fig.update_traces(texttemplate='%{y:.2f} €', textposition='top')  # Betrag an den Linien anzeigen
+        line_fig.update_traces(texttemplate='%{y:.2f} €', textposition='top center')  # Betrag an den Linien anzeigen
 
         st.plotly_chart(line_fig)
 
