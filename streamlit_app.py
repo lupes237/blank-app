@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 from datetime import datetime, timedelta
+import plotly.express as px
 
 # Funktion zum Extrahieren von Tarifinformationen
 def get_tarif(tarif, options):
@@ -94,5 +95,19 @@ if st.button("Tarife abrufen"):
         # Tabelle anzeigen
         st.write("Tariftabelle (aufsteigend nach Beitrag sortiert):")
         st.dataframe(df_tarifs_sorted)
+
+        # Punktdiagramm erstellen
+        fig = px.scatter(
+            df_tarifs_sorted,
+            x="Beitrag",
+            y="Tarifname",
+            color="Anbietername",  # Farben je nach Anbietername
+            hover_data=["Beitrag", "Tarifname", "Rabatt", "Pannenhilfe", "Ersatzwagen", "Abschleppen", "Krankenruecktransport"],
+            title="Punktdiagramm der Tarife",
+            labels={"Beitrag": "Beitrag in Euro", "Tarifname": "Tarifname"}
+        )
+        
+        # Diagramm anzeigen
+        st.plotly_chart(fig)
     else:
         st.write("Keine Tarife gefunden.")
