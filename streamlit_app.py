@@ -78,7 +78,7 @@ alter = st.slider("Alter:", 18, 31)
 
 # Button zum Abrufen der Daten
 if st.button("Tarife abrufen"):
-    url = generate_url(region, g_person=person, umwelt_rabatt=umwelrabatt, plz=plz, alter=alter)
+    url = generate_url(region, g_person=person, umwelt_rabatt=umweltrabatt, plz=plz, alter=alter)
     options = {
         'region': region,
         'person': person,
